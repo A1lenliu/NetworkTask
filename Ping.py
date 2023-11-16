@@ -110,9 +110,16 @@ def doOnePing(destinationAddress, timeout):
     return delay
 
 
-def ping(host, timeout=1):
-    dest = socket.gethostbyname(host)
-    print(f"Pinging {host} [{dest}] with timeout {timeout} seconds:")
+def ping(target, timeout=1):
+    try:
+        dest = socket.gethostbyname(target)
+    except socket.gaierror:
+        print("Invalid target address or hostname.")
+        return
+
+    print(f"Pinging {target} [{dest}] with timeout {timeout} seconds:")
+
+    delays = []  # List to store delay values
 
     try:
         while True:
@@ -121,11 +128,16 @@ def ping(host, timeout=1):
                 print("Request timed out.")
             else:
                 print(f"Round Trip Time: {delay * 1000:.6f} ms")
+                delays.append(delay)
+
             time.sleep(1)  # Ping approximately every second
 
     except KeyboardInterrupt:
         print("\nPing stopped by the user.")
-
+        if delays:
+            print(f"Minimum Delay: {min(delays) * 1000:.6f} ms")
+            print(f"Average Delay: {sum(delays) / len(delays) * 1000:.6f} ms")
+            print(f"Maximum Delay: {max(delays) * 1000:.6f} ms")
 
 # Usage example
 ping("lancaster.ac.uk")
