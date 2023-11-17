@@ -2,12 +2,11 @@ import socket
 import struct
 import time
 
-def traceroute(target, max_hops=30, timeout=2):
+def traceroute(target, max_hops=30, timeout=1):
     for ttl in range(1, max_hops + 1):
         # 创建UDP套接字
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         udp_socket.setsockopt(socket.IPPROTO_IP, socket.IP_TTL, ttl)
-
 
         # 设置超时时间
         udp_socket.settimeout(timeout)
@@ -33,8 +32,6 @@ def traceroute(target, max_hops=30, timeout=2):
                 break
 
         except socket.timeout:
-            print(f"{ttl}: *")
-        except socket.error:
             print(f"{ttl}: *")
         finally:
             udp_socket.close()
