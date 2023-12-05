@@ -1,57 +1,44 @@
+import socket
+from urllib.parse import unquote
 
-def handleRequest(tcpSocket):
+def handle_request(client_socket):
+    content = b''  # Initialize content variable outside the try block
     try:
-        # 1. Receive request message from the client on connection socket
-        requestMessage = tcpSocket.recv(1024).decode('utf-8')
+        # ... (keep the original request handling code)
 
-        # 2. Extract the path of the requested object from the message (second part of the HTTP header)
-        requestHeaders = requestMessage.split('\r\n')
-        if len(requestHeaders) > 0:
-            requestLine = requestHeaders[0].split()
-            if len(requestLine) > 1:
-                path = requestLine[1]
-                filePath = path.lstrip("/")
+        # 准备200 OK响应头
+        response_header = "HTTP/1.1 200 OK\r\n"
+        server_info = "Server: SimpleHTTPServer\r\n"
+        # 组装完整的HTTP响应
+        response = response_header + server_info + "\r\n" + content.decode("utf-8")
+        client_socket.sendall(response.encode("utf-8"))  # 向客户端发送响应
 
-                # 3. Read the corresponding file from disk
-                with open(filePath, 'rb') as file:
-                    content = file.read()
+    except FileNotFoundError:
+        # 准备404 Not Found响应头
+        response_header = "HTTP/1.1 404 Not Found\r\n"
+        server_info = "Server: SimpleHTTPServer\r\n"
+        # 组装完整的HTTP错误响应
+        response = response_header + server_info + "\r\n" + "File Not Found\nCheck your input\n"
+        client_socket.sendall(response.encode("utf-8"))  # 向客户端发送错误响应
 
-                # 4. Send the correct HTTP response header and content
-                responseHeader = "HTTP/1.1 200 OK\r\n\r\n"
-                tcpSocket.sendall(responseHeader.encode('utf-8'))
-                tcpSocket.sendall(content)
-            else:
-                # If the request line is not as expected, send a 400 Bad Request response
-                response = "HTTP/1.1 400 Bad Request\r\n\r\n"
-                tcpSocket.sendall(response.encode('utf-8'))
-    except Exception as e:
-        print("Error handling request:", e)
     finally:
-        # 7. Close the connection socket
-        tcpSocket.close()
+        client_socket.close()  # 关闭客户端套接字
 
-def startServer(serverAddress, serverPort):
-    # 1. Create server socket
-    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+def start_server(server_addr, server_port):
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 创建TCP套接字
+    server_socket.bind((server_addr, server_port))  # 绑定地址和端口
+    server_socket.listen(0)  # 开始监听
     try:
-        # 2. Bind the server socket to server address and server port
-        serverSocket.bind((serverAddress, serverPort))
-
-        # 3. Continuously listen for connections to server socket
-        serverSocket.listen()
-
         while True:
-            print("Waiting for connections...")
-            # 4. When a connection is accepted, call handleRequest function, passing new connection socket
-            connectionSocket, clientAddress = serverSocket.accept()
-            print("Accepted connection from", clientAddress)
-            handleRequest(connectionSocket)
-    except Exception as e:
-        print("Error starting server:", e)
+            print("waiting for connecting...")
+            client_socket, client_addr = server_socket.accept()  # 接受一个新连接
+            print("one connection is established and its address is: %s" % str(client_addr))
+            handle_request(client_socket)  # 调用后端函数处理请求
+            print("client close")
+    except Exception as err:
+        print(err)
     finally:
-        # 5. Close server socket
-        serverSocket.close()
+        server_socket.close()  # 关闭服务器套接字
 
-# Call the startServer function with the desired server address and port
-startServer("", 8000)
+# 启动服务器
+start_server("127.0.0.1", 8080)
