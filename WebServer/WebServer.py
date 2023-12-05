@@ -2,7 +2,6 @@ import socket
 from urllib.parse import unquote
 
 
-# ... (前面的代码保持不变)
 
 # 修改 handle_request 函数，添加额外的输出
 def handle_request(client_socket):
