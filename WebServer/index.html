@@ -2,6 +2,47 @@
 <html>
 <head>
 	<style>
+		:root {
+            --width: 100px;
+            --height: 100px;
+            --half-radius: -50px;
+        }
+        #heart {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            width: var(--width);
+            height: var(--height);
+            background-color: pink;
+            transform: rotate(45deg);
+        }
+        #heart::before {
+            content: "";
+            position: absolute;
+            width: var(--width);
+            height: var(--height);
+            border-radius: 50%;
+            background-color: pink;
+            left: var(--half-radius);
+            /* 最后一行相当于->  right: var(--half-radius) */
+        }
+        #heart::after {
+            content: "";
+            position: absolute;
+            width: var(--height);
+            height: var(--width);
+            border-radius: 50%;
+            background-color: pink;
+            top: var(--half-radius);
+            /* /* 最后一行相当于-> bottom: var(--half-radius) */
+        }
+	</style>
+
+	<div id="heart"></div>
+	<style>
 		body {
           display: flex;
           justify-content: center;
