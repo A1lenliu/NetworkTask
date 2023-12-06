@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+		:root {
+            --width: 100px;
+            --height: 100px;
+            --half-radius: -50px;
+        }
+        #heart {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            width: var(--width);
+            height: var(--height);
+            background-color: pink;
+            transform: rotate(45deg);
+        }
+        #heart::before {
+            content: "";
+            position: absolute;
+            width: var(--width);
+            height: var(--height);
+            border-radius: 50%;
+            background-color: pink;
+            left: var(--half-radius);
+            /* 最后一行相当于->  right: var(--half-radius) */
+        }
+        #heart::after {
+            content: "";
+            position: absolute;
+            width: var(--height);
+            height: var(--width);
+            border-radius: 50%;
+            background-color: pink;
+            top: var(--half-radius);
+            /* /* 最后一行相当于-> bottom: var(--half-radius) */
+        }
+	</style>
+
+	<div id="heart"></div>
+	<style>
+		body {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          background-color: lightblue;
+        }
+        .box {
+          width: 200px;
+          height: 200px;
+          background-color: white;
+          border-radius: 10px;
+          box-shadow: 0 0 10px black;
+          text-align: center;
+          line-height: 200px;
+          font-size: 36px;
+          color: black;
+          animation: rotate 5s linear infinite;
+        }
+
+	</style>
+</head>
+<body>
+<div class="box">Hello SongYize!</div>
+</body>
+</html>
