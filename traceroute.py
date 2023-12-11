@@ -15,6 +15,7 @@ class PING:
     CODE_ECHO_REQUEST_DEFAULT = 0
 
     def chesksum(self, data):
+        # 计算传入数据的校验和
         n = len(data)
         m = n % 2
         sum = 0
@@ -34,6 +35,7 @@ class PING:
 
     def request_ping(self, data_type, data_code, data_checksum, data_ID,
                      data_Sequence, payload_body):
+        #创建一个 ICMP 请求数据包。
         #  把字节打包成二进制数据
         imcp_packet = struct.pack('>BBHHH32s', data_type, data_code,
                                   data_checksum, data_ID, data_Sequence,
@@ -47,7 +49,7 @@ class PING:
 
     def raw_socket(self, dst_addr, imcp_packet):
         '''
-        连接套接字,并将数据发送到套接字
+         创建并配置原始套接字，发送 ICMP 请求数据包。
         '''
 
         #实例化一个socket对象，ipv4，原套接字，分配协议端口
@@ -66,6 +68,7 @@ class PING:
                    rawsocket,
                    data_Sequence,
                    timeout=5):
+        #接收并解析 ICMP 响应数据包
         while True:
             #开始时间
             started_select = time.time()
@@ -107,6 +110,7 @@ class PING:
         :param ip_header:
         :return:
         """
+        #获取 IP 版本、头部长度、报文总长度、TTL、协议、头部校验和等信息。
         line1 = struct.unpack('>BBH', ip_header[:4])  # 先按照8位、8位、16位解析
         ip_version = line1[0] >> 4  # 通过右移4位获取高四位
         # 报文头部长度的单位是32位 即四个字节
@@ -133,6 +137,7 @@ class PING:
         }
 
     def ping(self, host):
+        #打印 Ping 统计信息，包括发送、接收、丢失数量以及往返时间的最小、最大和平均值。
         send, accept, lost = 0, 0, 0
         sumtime, shorttime, longtime, avgtime = 0, 1000, 0, 0
         #icmp数据包的构建

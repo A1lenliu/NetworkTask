@@ -8,6 +8,8 @@ Additional features are 1. Accept IP or host name as parameter 2. Display minimu
 
 2. recreate the traceroute tool
 
+3. WebServe
+
 
 
 1. What is the primary purpose of the ICMP Ping tool?
@@ -35,3 +37,60 @@ Additional features are 1. Accept IP or host name as parameter 2. Display minimu
    - **A:** HTTP Web 服务器的主要功能是处理来自客户端的 HTTP 请求并响应请求的网页或资源。
 6. **Q: 测试 Web 代理时可能遇到的挑战有哪些？**
    - **A:** 挑战可能包括确保代理正确处理各种 HTTP 方法、缓存、HTTPS 连接，以及测试在不同负载下的性能和安全性。
+   
+     
+   
+     在TASK1.1中我实现了通过构建和解析ICMP报文，使用套接字发送和接收数据和解析IP头部信息，实现了PING功能，我通过循环发送ICMP请求，等待响应后，统计相关信息。
+   
+     在PING中我使用了
+   
+     chesksum方法：
+   
+     该方法用于计算ICMP报文的校验和。
+     通过对每两个字节进行加和，处理奇数长度的情况，最终得到16位校验和。
+     实现了主机字节序到网络字节序的转换。
+     request_ping方法：
+   
+     该方法用于构建ICMP请求报文。
+     使用struct.pack方法将各个字段打包成二进制数据。
+     调用chesksum方法计算校验和，并将其替换到报文中。
+     raw_socket方法：
+   
+     该方法用于连接套接字并将ICMP请求报文发送到套接字。
+     使用原始套接字 (socket.SOCK_RAW) 来发送 ICMP 报文。
+     返回发送请求的时间、套接字对象和目标地址。
+     reply_ping方法：
+   
+     该方法用于处理ICMP响应。
+     使用select函数等待套接字可读，并处理超时情况。
+     解析接收到的 ICMP 响应头部，并判断是否为预期的响应。
+     parse_ip_header方法：
+   
+     该方法用于解析 IP 头部信息。
+     通过struct.unpack方法解析 IP 头部的各个字段，包括版本、头部长度、TTL 等。
+     ping方法：
+   
+     该方法是整个 Ping 过程的入口。
+     通过循环发送 ICMP 请求，等待响应，并统计丢包率和往返时间。
+     使用raw_socket方法发送 ICMP 请求，通过reply_ping方法处理响应。
+   
+     在TASK1.2中，由于traceroute方法和ping方法类似，所以我的traceroute类继承了PING类，通过创建套接字，并设置TTL，通过逐步增加TTL，发送ICMP请求，等待响应，记录相关信息。
+   
+     在TRACEROUTE中我使用了
+   
+     traceroute_raw_socket方法：
+   
+     该方法用于创建原始套接字，设置 TTL，并将 ICMP 请求报文发送到套接字。
+     返回发送请求的时间、套接字对象和目标地址。
+     build_imcp_packet方法：
+   
+     该方法用于构建 ICMP 请求报文。
+     使用struct.pack方法将各个字段打包成二进制数据。
+     调用chesksum方法计算校验和，并将其替换到报文中。
+     traceroute方法：
+   
+     该方法是整个 Traceroute 过程的入口。
+     使用循环依次增加 TTL，通过traceroute_raw_socket方法发送 ICMP 请求，并等待响应。
+     处理 ICMP 响应，包括解析 IP 头部信息，判断是否到达目标，记录相关信息。
+     打印每个 TTL 的信息，直到到达目标或超过最大跳数。
+
